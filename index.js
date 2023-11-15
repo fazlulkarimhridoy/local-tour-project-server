@@ -28,11 +28,13 @@ async function run() {
     const services = client.db("tourDB").collection("services");
     const bookings = client.db("tourDB").collection("myBookings");
 
+
     // all services
     app.get("/services", async (req, res) => {
       const result = await services.find().toArray();
       res.send(result);
     });
+
 
     // bookings by current user
     app.get("/myBooking/:email", async (req, res) => {
@@ -42,6 +44,17 @@ async function run() {
       res.send(result);
     });
 
+
+    // pending works form bookings by current user
+    app.get("/myPendingWorks/:email", async(req, res)=>{
+      const email = req.params.email;
+      const query = { providerEmail : email};
+      const result = await bookings.find(query).toArray();
+      res.send(result)
+      console.log(result);
+    })
+
+
     // services by id
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
@@ -50,12 +63,14 @@ async function run() {
       res.send(result);
     });
 
+
     // booking a service from service detail page
     app.post("/addBooking", async (req, res) => {
       const booking = req.body;
       const result = await bookings.insertOne(booking);
       res.send(result);
     });
+
 
     // add a new service
     app.post("/addService", async(req, res)=>{
