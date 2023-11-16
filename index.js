@@ -68,6 +68,14 @@ async function run() {
       res.send(result);
     });
 
+    // get a service by  service name;
+    app.get("/findService/:name", async(req, res)=>{
+        const name = req.params.name;
+        const query = { ServiceName : name };
+        const result = await services.find(query).toArray();
+        res.send(result);
+    })
+
 
     // all post api
 
