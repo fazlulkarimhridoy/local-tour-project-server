@@ -28,15 +28,23 @@ async function run() {
     const services = client.db("tourDB").collection("services");
     const bookings = client.db("tourDB").collection("myBookings");
 
+    // all get api
 
-    // all services
+    // get all services
     app.get("/services", async (req, res) => {
       const result = await services.find().toArray();
       res.send(result);
     });
 
+    // get services by current user
+    app.get("/service/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { ServiceProviderEmail: email };
+      const result = await services.find(query).toArray();
+      res.send(result);
+    });
 
-    // bookings by current user
+    // get bookings by current user
     app.get("/myBooking/:email", async (req, res) => {
       const email = req.params.email;
       const query = { userEmail: email };
@@ -44,18 +52,15 @@ async function run() {
       res.send(result);
     });
 
-
-    // pending works form bookings by current user
-    app.get("/myPendingWorks/:email", async(req, res)=>{
+    // get pending works form bookings by current user
+    app.get("/myPendingWorks/:email", async (req, res) => {
       const email = req.params.email;
-      const query = { providerEmail : email};
+      const query = { providerEmail: email };
       const result = await bookings.find(query).toArray();
-      res.send(result)
-      console.log(result);
-    })
+      res.send(result);
+    });
 
-
-    // services by id
+    // get services by id
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -64,20 +69,73 @@ async function run() {
     });
 
 
-    // booking a service from service detail page
+    // all post api
+
+    // post a booking service from service detail page
     app.post("/addBooking", async (req, res) => {
       const booking = req.body;
       const result = await bookings.insertOne(booking);
       res.send(result);
     });
 
-
-    // add a new service
-    app.post("/addService", async(req, res)=>{
+    // post a new service
+    app.post("/addService", async (req, res) => {
       const service = req.body;
       const result = await services.insertOne(service);
       res.send(result);
+    });
+
+
+    // all update api
+
+    // update a service
+    app.put("/services/:id", async (req, res)=>{
+      const id = req.params.id;
+      const filter = { _id : new ObjectId(id) };
+      const options = {upsert : true};
+      const updatedProduct = req.body;
+      const doc = {
+        $set : {
+          ServiceName : updatedProduct.ServiceName,
+          ServiceImage : updatedProduct.ServiceImage,
+          ServiceProviderName : updatedProduct.ServiceProviderName,
+          ServiceProviderImage : updatedProduct.ServiceProviderImage,
+          ServiceArea : updatedProduct.ServiceArea,
+          ServicePrice : updatedProduct.ServicePrice,
+          ServiceProviderEmail : updatedProduct.ServiceProviderEmail,
+          ServiceDescription : updatedProduct.ServiceDescription
+        }
+      }
+      const result = await services.updateOne(filter, doc, options);
+      res.send(result)
+      console.log("id", id);
+      console.log("filter", filter);
+      console.log("updated product", updatedProduct);
+      console.log("updated data", doc);
+      console.log("result", result);
     })
+
+
+    // all delete api
+
+    // delete a booking
+    app.delete("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await bookings.deleteOne(query);
+      res.send(result);
+    });
+
+
+    // delete a logged in users service
+    app.delete("/service/:id", async (req, res)=>{
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)};
+      const result = await services.deleteOne(query);
+      res.send(result);
+    })
+
+
 
 
 
