@@ -178,11 +178,6 @@ async function run() {
       };
       const result = await services.updateOne(filter, doc, options);
       res.send(result);
-      console.log("id", id);
-      console.log("filter", filter);
-      console.log("updated product", updatedProduct);
-      console.log("updated data", doc);
-      console.log("result", result);
     });
 
     // all delete api
